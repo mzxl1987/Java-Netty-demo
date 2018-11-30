@@ -1,4 +1,4 @@
-package com.miicrown.nt;
+package com.miicrown.server;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
