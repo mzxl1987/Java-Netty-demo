@@ -64,7 +64,7 @@ public class EchoServer {
 				if(future.isSuccess()){
 					log.info("VVVV启动成功VVVV, 端口{}",configCopy.getPort());
 				}else{
-					log.info("XXXX启动失败XXXX, 端口{}",configCopy.getPort());
+					log.error("XXXX启动失败XXXX, 端口{}",configCopy.getPort());
 				}
 			}
 		}) ;
