@@ -27,6 +27,8 @@ public class EchoServer {
 	private final Configuration configuration;
 	private final Configuration configCopy;
 	
+	private ServerInitializer serverInitializer = new ServerInitializer();
+	
 	private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 	
@@ -47,10 +49,12 @@ public class EchoServer {
 			
 		Class<? extends ServerChannel> channel = configCopy.isUseLinuxNativeEpoll() ? EpollServerSocketChannel.class : NioServerSocketChannel.class;
 		
-		ServerBootstrap b = new ServerBootstrap();
+		serverInitializer.start();
+		
+		ServerBootstrap b = new ServerBootstrap();  //TCP
 		b.group(bossGroup, workerGroup)
 		.channel(channel)
-		.childHandler(new ServerInitializer());
+		.childHandler(serverInitializer);
 		
 		InetSocketAddress addr = new InetSocketAddress(configCopy.getPort());
 		if(configCopy.getHost() != null){

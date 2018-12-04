@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.miicrown.protocol.ProtocalMsg;
+import com.miicrown.protocol.ProtocalType;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -51,7 +52,7 @@ public class EchoClient {
 
 	public static void main(String[] args) throws Exception {
 		
-		for(int i =0,max=3000; i < max; i++){
+		for(int i =0,max=300; i < max; i++){
 			new Thread(new Runnable() {
 				public void run() {
 					try {
@@ -76,7 +77,7 @@ public class EchoClient {
 						
 						ProtocalMsg pm = ProtocalMsg.createInstance();
 						
-						pm.setType(ProtocalMsg.Type.Login.getType())
+						pm.setType(ProtocalType.Login.getType())
 							.setLength(2)
 							.setData(new byte[]{0x00,0x08});
 						

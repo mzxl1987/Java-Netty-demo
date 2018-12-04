@@ -8,33 +8,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 
-public class ProtocalMsg implements Serializable {
+public class ProtocalMsg {
 
 	public static AtomicInteger ai = new AtomicInteger(0);
 	
 	public static final int HEAD = 0xDDDD;
 	public static final int TAIL = 0xBBBB;
 	public static final int MINLENGTH = 6;
-
-	public enum Type {
-		Login(0x01),
-		Response(0xFF);
 		
-		private int type;
-		private Type(int type){
-			this.type = type;
-		}
-		
-		public int getType() {
-			return type;
-		}
-
-		@Override
-		public String toString() {
-			return "type: " + this.type;
-		}
-	}
-	
 	/**
 	 * 
 	 */
