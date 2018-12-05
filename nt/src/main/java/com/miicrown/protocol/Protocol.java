@@ -12,8 +12,7 @@ import io.netty.buffer.Unpooled;
  * 消息体：用户自定义内容，                                   不定长度                   
  * crc校验：[消息体] 的CRC校验,             不定长度
  * 帧尾：0x16                              1byte 
- * @author Administrator
- * @param <IVerification>
+ * @author Administrator    朱露露
  *
  */
 public class Protocol implements IProtocol, IVerification{
@@ -151,7 +150,9 @@ public class Protocol implements IProtocol, IVerification{
 
 
 	/**
-	 * @param content the content to set
+	 * 设置协议内容
+	 * @param bb    ByteBuf参数,存有byte数据
+	 * @param len   需要截取内容的长度
 	 */
 	public void setContent(ByteBuf bb,int len) {
 		ByteBuf t_bb = bb.readSlice(len);

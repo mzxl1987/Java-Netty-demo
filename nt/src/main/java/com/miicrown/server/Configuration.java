@@ -1,5 +1,10 @@
 package com.miicrown.server;
 
+/**
+ * 配置内容
+ * @author Administrator  朱露露
+ *
+ */
 public class Configuration {
 
 	private String host = "localhost";
@@ -10,13 +15,16 @@ public class Configuration {
 	private int bossThreads = 0; // 0 = current_processors_amount * 2
     private int workerThreads = 0; // 0 = current_processors_amount * 2
 	
+    /**
+     * 构造函数
+     */
 	private Configuration() {
 
 	}
 	
 	/**
 	 * 创建配置对象
-	 * @return
+	 * @return  返回Configuration对象
 	 */
 	public static Configuration createInstance(){
 		return new Configuration();
@@ -24,8 +32,8 @@ public class Configuration {
 	
 	/**
 	 * 拷贝配置对象
-	 * @param source
-	 * @return
+	 * @param source     拷贝对象的原始值
+	 * @return           返回考呗后的对象
 	 */
 	public static Configuration cloneInstance(Configuration source){
 		
@@ -40,6 +48,10 @@ public class Configuration {
 
 	/**************************    get/set    ****************************************/
 
+	/**
+	 * 
+	 * @return  返回Host地址
+	 */
 	public String getHost() {
 		return host;
 	}
