@@ -1,7 +1,7 @@
 package com.miicrown.scheduler;
 
 public class SchedulerKey {
-	public enum Type {PING_TIMEOUT, ACK_TIMEOUT, UPGRADE_TIMEOUT};
+	public enum Type {HEARTBEAT_TIMEOUT};
 
     private final Type type;
     private final Object sessionId;

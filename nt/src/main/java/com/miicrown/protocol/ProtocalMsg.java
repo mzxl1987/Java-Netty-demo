@@ -14,7 +14,7 @@ public class ProtocalMsg {
 	
 	public static final int HEAD = 0xDDDD;
 	public static final int TAIL = 0xBBBB;
-	public static final int MINLENGTH = 6;
+	
 		
 	/**
 	 * 

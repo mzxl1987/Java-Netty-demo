@@ -1,23 +1,30 @@
 package com.miicrown.server;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.miicrown.protocol.ProtocalMsg;
+import com.miicrown.protocol.LoginProtocol;
+import com.miicrown.protocol.Protocol;
+import com.miicrown.protocol.ResponseProtocol;
 import com.miicrown.scheduler.CancelableScheduler;
-import com.miicrown.scheduler.HashedWheelTimeoutScheduler;
+import com.miicrown.scheduler.SchedulerKey;
 
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.internal.PlatformDependent;
 
 @Sharable
 public class EchoServerHandler extends ChannelInboundHandlerAdapter{
 	
 	private static final Logger log = LoggerFactory.getLogger(EchoServerHandler.class);
 	
+	private static final Object MAP_VALUE = new Object();
+	private final Map<Channel, Object> clients = PlatformDependent.newConcurrentHashMap();
 	private final CancelableScheduler disconnectScheduler;
 	
 	public EchoServerHandler(CancelableScheduler scheduler) {
@@ -26,34 +33,62 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter{
 	
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		
 		super.channelInactive(ctx);
 	}
 	
 	@Override
-	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+	public void channelActive(final ChannelHandlerContext ctx) throws Exception {
 		
-		log.info(" 新的连接 {} ",ctx);
+		clients.put(ctx.channel(), EchoServerHandler.MAP_VALUE);
+		
+		log.info(" 新的连接 {} , 客户端数量 ：{}",ctx, clients.size());
+		
+		disconnectScheduler.schedule(new SchedulerKey(SchedulerKey.Type.HEARTBEAT_TIMEOUT, ctx), new Runnable() {
+			@Override
+			public void run() {
+				clients.remove(ctx.channel());
+				ctx.channel().close();
+				log.info("关闭客户端 {}, 客户端数量 {}", ctx,clients.size());
+			}
+		}, 10, TimeUnit.SECONDS);
 		
 		super.channelActive(ctx);
 		
 	}
 	
 	@Override
-	public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+	public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
 		
-		log.info( "{} , Server received: {} ",ctx.channel().id().asLongText(),msg);
+		log.info( "{} , Message : {} ",ctx.channel().id().asLongText(),msg);
 		
-		ProtocalMsg pm = ProtocalMsg.createInstance();
-		pm.setHead(ProtocalMsg.HEAD);
-		pm.setType(1);
-		byte[] data = new byte[]{0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09}; 
-		pm.setData(data);
-		pm.setLength(data.length);
-		pm.setTail(ProtocalMsg.TAIL);
+		Protocol response = null;
 		
-		ctx.writeAndFlush(pm);
+		if(msg instanceof LoginProtocol){
+			response = new ResponseProtocol(ResponseProtocol.TYPE);
+			response.setLength(3);
+			response.setContent(new byte[]{ (byte)0x88 ,(byte)0x89, (byte)0x90 });
+			response.encodeVerification(response.getContent());
+			
+			disconnectScheduler.schedule(new SchedulerKey(SchedulerKey.Type.HEARTBEAT_TIMEOUT, ctx), new Runnable() {
+				@Override
+				public void run() {
+					clients.remove(ctx.channel());
+					ctx.channel().close();
+					log.info("关闭客户端 {}, 客户端数量 {}", ctx,clients.size());
+				}
+			}, 10, TimeUnit.SECONDS);
+			
+			
+			
+		}
 		
+		if(msg instanceof ResponseProtocol){
+			
+		}
+		
+		if(null != response){
+			ctx.writeAndFlush(response);
+		}
 	}
 	
 	@Override

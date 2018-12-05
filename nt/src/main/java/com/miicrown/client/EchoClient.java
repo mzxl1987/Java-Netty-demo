@@ -4,8 +4,8 @@ import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.miicrown.protocol.ProtocalMsg;
-import com.miicrown.protocol.ProtocalType;
+import com.miicrown.protocol.LoginProtocol;
+import com.miicrown.protocol.Protocol;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -75,14 +75,15 @@ public class EchoClient {
 					Iterator<ChannelHandlerContext> it = Items.values().iterator();
 					while(it.hasNext()){
 						
-						ProtocalMsg pm = ProtocalMsg.createInstance();
-						
-						pm.setType(ProtocalType.Login.getType())
-							.setLength(2)
-							.setData(new byte[]{0x00,0x08});
-						
 						ChannelHandlerContext ctx = it.next();
-						ctx.writeAndFlush(pm.toByteBuf());
+						
+						Protocol login = new LoginProtocol(LoginProtocol.TYPE);
+						login.setLength(1);
+						login.setType(LoginProtocol.TYPE);
+						login.setContent(new byte[]{(byte)0xEE});
+						login.encodeVerification(login.getContent());
+						
+						ctx.writeAndFlush(login.toByteBuf());
 						
 					}
 					
