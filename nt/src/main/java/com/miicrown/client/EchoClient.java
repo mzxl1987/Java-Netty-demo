@@ -6,8 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.miicrown.protocol.LoginProtocol;
 import com.miicrown.protocol.Protocol;
+import com.miicrown.protocol.ProtocolEncoder;
 
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
@@ -23,10 +25,26 @@ public class EchoClient {
 	
 	private final String host;
 	private final int port;
-
+	
+	public static final Protocol login;
+	public static final ByteBuf sendData;
+	
+	static{
+		
+		login = new LoginProtocol(LoginProtocol.TYPE);
+		login.setLength(1);
+		login.setType(LoginProtocol.TYPE);
+		login.setContent(new byte[]{(byte)0xEE});
+		login.encodeVerification(login.getContent());
+		
+		sendData = login.toByteBuf();
+		
+	}
+	
 	public EchoClient(String host, int port) {
 		this.host = host;
 		this.port = port;
+		
 	}
 
 	public void start() throws Exception {
@@ -38,7 +56,8 @@ public class EchoClient {
 
 						@Override
 						protected void initChannel(Channel ch) throws Exception {
-							ch.pipeline().addLast(new EchoClientHandler());
+							ch.pipeline()
+							.addLast(new EchoClientHandler());
 						}
 					});
 
@@ -52,12 +71,11 @@ public class EchoClient {
 
 	public static void main(String[] args) throws Exception {
 		
-		for(int i =0,max=300; i < max; i++){
+		for(int i =0,max=30; i < max; i++){
 			new Thread(new Runnable() {
 				public void run() {
 					try {
-						new EchoClient("127.0.0.1", 8005).start();
-						System.out.println("I:");
+						new EchoClient("127.0.0.1", 7005).start();
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -76,12 +94,6 @@ public class EchoClient {
 					while(it.hasNext()){
 						
 						ChannelHandlerContext ctx = it.next();
-						
-						Protocol login = new LoginProtocol(LoginProtocol.TYPE);
-						login.setLength(1);
-						login.setType(LoginProtocol.TYPE);
-						login.setContent(new byte[]{(byte)0xEE});
-						login.encodeVerification(login.getContent());
 						
 						ctx.writeAndFlush(login.toByteBuf());
 						

@@ -10,7 +10,7 @@ public class App
     {
     	Configuration configuration = Configuration.createInstance();
     	configuration.setHost("127.0.0.1");
-    	configuration.setPort(8005);
+    	configuration.setPort(7005);
     	
     	new EchoServer(configuration).start();
     }

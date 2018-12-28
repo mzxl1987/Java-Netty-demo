@@ -338,9 +338,9 @@
 				<version>2.5.5</version>
 				<configuration>
 					<archive>
-						<manifest>
-							                 
-							<mainClass>com.miicrown.server.App</mainClass>   <!-- 此处存放运行的主类 -->
+						<manifest>           
+							 <!-- <mainClass>com.miicrown.server.App</mainClass> -->   <!--此处存放运行的主类 -->
+							<mainClass>com.miicrown.client.EchoClient</mainClass>   <!-- 此处存放运行的主类 -->
 						</manifest>
 					</archive>
 					<descriptorRefs>

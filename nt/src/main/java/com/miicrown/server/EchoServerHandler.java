@@ -59,11 +59,12 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter{
 	@Override
 	public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
 		
-		log.info( "{} , Message : {} ",ctx.channel().id().asLongText(),msg);
-		
-		Protocol response = null;
-		
 		if(msg instanceof LoginProtocol){
+			
+			log.info( "{} , Message : {} ",ctx.channel().id().asLongText(),msg);
+			
+			Protocol response = null;
+			
 			response = new ResponseProtocol(ResponseProtocol.TYPE);
 			response.setLength(3);
 			response.setContent(new byte[]{ (byte)0x88 ,(byte)0x89, (byte)0x90 });
@@ -78,17 +79,13 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter{
 				}
 			}, 10, TimeUnit.SECONDS);
 			
+			if(null != response){
+				ctx.writeAndFlush(response);
+			}
 			
-			
-		}
-		
-		if(msg instanceof ResponseProtocol){
-			
-		}
-		
-		if(null != response){
-			ctx.writeAndFlush(response);
-		}
+		}else{
+			ctx.fireChannelRead(msg);
+		}	
 	}
 	
 	@Override
